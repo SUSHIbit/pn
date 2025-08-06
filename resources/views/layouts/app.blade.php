@@ -15,7 +15,7 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Left Sidebar - Improved -->
+        <!-- Left Sidebar - Updated -->
         <aside class="left-sidebar" id="leftSidebar">
             <button class="sidebar-toggle" onclick="toggleLeftSidebar()" title="Toggle Navigation">
                 <i class="fas fa-bars"></i>
@@ -31,6 +31,18 @@
                         <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
                             <i class="fas fa-home"></i>
                             <span class="collapse-hide">Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('posts.index') }}" class="nav-link {{ request()->routeIs('posts.index') ? 'active' : '' }}">
+                            <i class="fas fa-newspaper"></i>
+                            <span class="collapse-hide">All Posts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('posts.my') }}" class="nav-link {{ request()->routeIs('posts.my') ? 'active' : '' }}">
+                            <i class="fas fa-file-alt"></i>
+                            <span class="collapse-hide">My Posts</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -52,7 +64,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('posts.create') }}" class="nav-link {{ request()->routeIs('posts.create') ? 'active' : '' }}">
                             <i class="fas fa-plus-circle"></i>
                             <span class="collapse-hide">Create Post</span>
                         </a>

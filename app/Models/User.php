@@ -32,6 +32,22 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    /**
+     * Get all posts for this user
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    /**
+     * Get published posts for this user
+     */
+    public function publishedPosts()
+    {
+        return $this->hasMany(Post::class)->published()->latest();
+    }
+
     public static function generateUsername($name)
     {
         $username = strtolower(str_replace(' ', '', $name));
@@ -57,5 +73,13 @@ class User extends Authenticatable
             return asset('uploads/avatars/' . $this->avatar);
         }
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->display_name) . '&background=78716c&color=fff&size=100';
+    }
+
+    /**
+     * Get posts count for this user
+     */
+    public function getPostsCountAttribute()
+    {
+        return $this->posts()->published()->count();
     }
 }

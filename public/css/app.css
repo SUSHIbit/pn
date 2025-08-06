@@ -620,3 +620,241 @@ p {
     line-height: 1.7;
     color: var(--stone-600);
 }
+
+/* Additional styles for Phase 2 - Add these to existing app.css */
+
+/* Post-specific styles */
+.post-card {
+    transition: all 0.2s ease;
+}
+
+.post-card:hover {
+    background-color: var(--stone-50);
+    border-radius: 12px;
+    padding: 20px;
+    margin: -10px -20px 20px -20px;
+}
+
+/* Image upload preview */
+.image-preview {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+}
+
+/* Content formatting in posts */
+.post-content {
+    font-family: 'Merriweather', serif;
+    font-size: 18px;
+    line-height: 1.8;
+    color: var(--stone-700);
+}
+
+.post-content p {
+    margin-bottom: 1.5em;
+}
+
+/* Post meta information */
+.post-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: var(--stone-500);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.post-meta i {
+    width: 16px;
+    text-align: center;
+}
+
+/* Post status indicators */
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.draft {
+    background-color: #fbbf24;
+    color: white;
+}
+
+.status-badge.published {
+    background-color: #10b981;
+    color: white;
+}
+
+/* Form enhancements for post creation */
+.form-control textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.file-input-wrapper input[type=file] {
+    position: absolute;
+    left: -9999px;
+}
+
+/* Post actions */
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid var(--stone-200);
+    margin-top: 20px;
+}
+
+.post-actions .social-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.post-actions .manage-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Pagination styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.pagination a,
+.pagination span {
+    padding: 8px 12px;
+    border: 1px solid var(--stone-300);
+    border-radius: 6px;
+    color: var(--stone-600);
+    text-decoration: none;
+    font-family: 'Merriweather', serif;
+    transition: all 0.2s;
+}
+
+.pagination a:hover {
+    background-color: var(--stone-100);
+    border-color: var(--stone-400);
+}
+
+.pagination .current {
+    background-color: var(--stone-800);
+    color: white;
+    border-color: var(--stone-800);
+}
+
+/* Responsive improvements for posts */
+@media (max-width: 768px) {
+    .post-card:hover {
+        margin: -10px -15px 20px -15px;
+        padding: 15px;
+    }
+    
+    .post-actions {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .post-actions .social-actions,
+    .post-actions .manage-actions {
+        justify-content: center;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-buttons .btn {
+        min-width: 200px;
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--stone-300);
+    border-radius: 50%;
+    border-top-color: var(--stone-600);
+    animation: spin 1s ease-in-out infinite;
+    margin-left: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Success/Error message animations */
+.success-message,
+.error-message {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced focus states for accessibility */
+.form-control:focus,
+.btn:focus {
+    outline: 2px solid var(--stone-600);
+    outline-offset: 2px;
+}
+
+/* Post grid for different layouts */
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.posts-grid .post-card {
+    border: 1px solid var(--stone-200);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 0;
+    background-color: white;
+    transition: all 0.2s;
+}
+
+.posts-grid .post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    margin: 0;
+    padding: 20px;
+}
