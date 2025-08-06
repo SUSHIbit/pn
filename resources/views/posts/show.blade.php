@@ -74,20 +74,26 @@
             <div style="display: flex; gap: 12px;">
                 @auth
                     @php
-                        // Check if user has liked this post - query directly
-                        $hasLiked = \App\Models\Like::where('user_id', auth()->id())
-                                                   ->where('post_id', $post->id)
-                                                   ->exists();
-                        // Get likes count - query directly
+                        $hasLiked = \App\Models\Like::where('user_id', auth()->id())->where('post_id', $post->id)->exists();
                         $likesCount = \App\Models\Like::where('post_id', $post->id)->count();
                     @endphp
-                    <button class="like-btn btn {{ $hasLiked ? 'btn-primary' : 'btn-secondary' }}" 
-                            style="padding: 8px 16px; font-size: 14px; {{ $hasLiked ? 'background-color: #dc2626; color: white;' : '' }}" 
-                            data-post-id="{{ $post->id }}">
-                        <i class="fas fa-heart"></i> 
-                        <span class="like-text">{{ $hasLiked ? 'Liked' : 'Like' }}</span>
-                        (<span class="like-count">{{ $likesCount }}</span>)
-                    </button>
+                    @if($hasLiked)
+                        <button class="like-btn btn btn-secondary" 
+                                style="padding: 8px 16px; font-size: 14px; background-color: #dc2626; color: white;" 
+                                data-post-id="{{ $post->id }}">
+                            <i class="fas fa-heart"></i> 
+                            <span class="like-text">Liked</span>
+                            (<span class="like-count">{{ $likesCount }}</span>)
+                        </button>
+                    @else
+                        <button class="like-btn btn btn-secondary" 
+                                style="padding: 8px 16px; font-size: 14px;" 
+                                data-post-id="{{ $post->id }}">
+                            <i class="fas fa-heart"></i> 
+                            <span class="like-text">Like</span>
+                            (<span class="like-count">{{ $likesCount }}</span>)
+                        </button>
+                    @endif
                 @else
                     @php
                         $likesCount = \App\Models\Like::where('post_id', $post->id)->count();
@@ -103,7 +109,7 @@
                 <span class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;">
                     <i class="fas fa-comment"></i> {{ $commentsCount }}
                 </span>
-                <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;" onclick="navigator.share ? navigator.share({title: '{{ $post->title }}', url: '{{ route('posts.show', $post) }}'}) : copyToClipboard('{{ route('posts.show', $post) }}')">
+                <button class="btn btn-secondary share-btn" style="padding: 8px 16px; font-size: 14px;" data-title="{{ $post->title }}" data-url="{{ route('posts.show', $post) }}">
                     <i class="fas fa-share"></i> Share
                 </button>
             </div>
@@ -174,7 +180,6 @@
                 <p style="color: var(--stone-600); margin-bottom: 12px;">{{ $post->user->bio }}</p>
             @endif
             @php
-                // Get user stats manually
                 $userPostsCount = \App\Models\Post::where('user_id', $post->user->id)->where('is_published', true)->count();
                 $userFollowersCount = \App\Models\Follow::where('following_id', $post->user->id)->count();
                 $userFollowingCount = \App\Models\Follow::where('follower_id', $post->user->id)->count();
@@ -188,16 +193,19 @@
         @auth
             @if($post->user_id !== auth()->id())
                 @php
-                    // Check if current user is following this user
-                    $isFollowing = \App\Models\Follow::where('follower_id', auth()->id())
-                                                    ->where('following_id', $post->user->id)
-                                                    ->exists();
+                    $isFollowing = \App\Models\Follow::where('follower_id', auth()->id())->where('following_id', $post->user->id)->exists();
                 @endphp
-                <button class="follow-btn btn {{ $isFollowing ? 'btn-secondary' : 'btn-primary' }}" 
-                        data-user-id="{{ $post->user->id }}">
-                    <i class="fas {{ $isFollowing ? 'fa-user-check' : 'fa-user-plus' }}"></i>
-                    <span class="follow-text">{{ $isFollowing ? 'Following' : 'Follow' }}</span>
-                </button>
+                @if($isFollowing)
+                    <button class="follow-btn btn btn-secondary" data-user-id="{{ $post->user->id }}">
+                        <i class="fas fa-user-check"></i>
+                        <span class="follow-text">Following</span>
+                    </button>
+                @else
+                    <button class="follow-btn btn btn-primary" data-user-id="{{ $post->user->id }}">
+                        <i class="fas fa-user-plus"></i>
+                        <span class="follow-text">Follow</span>
+                    </button>
+                @endif
             @endif
         @endauth
     </div>
@@ -208,6 +216,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const likeBtn = document.querySelector('.like-btn');
     const followBtn = document.querySelector('.follow-btn');
+    const shareBtn = document.querySelector('.share-btn');
 
     // Handle like button
     if (likeBtn) {
@@ -269,14 +278,28 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Error:', error));
         });
     }
+
+    // Handle share button
+    if (shareBtn) {
+        shareBtn.addEventListener('click', function() {
+            const title = this.dataset.title;
+            const url = this.dataset.url;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: title,
+                    url: url
+                });
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Link copied to clipboard!');
+                });
+            }
+        });
+    }
 });
 
-// Copy to clipboard function for share
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Link copied to clipboard!');
-    });
-}
+
 </script>
 @endpush
 @endsection

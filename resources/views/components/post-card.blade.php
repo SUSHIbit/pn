@@ -45,18 +45,16 @@
         <div style="display: flex; gap: 15px;">
             @auth
                 @php
-                    // Check if user has liked this post - query directly
-                    $hasLiked = \App\Models\Like::where('user_id', auth()->id())
-                                               ->where('post_id', $post->id)
-                                               ->exists();
-                    // Get likes count - query directly
+                    $hasLiked = \App\Models\Like::where('user_id', auth()->id())->where('post_id', $post->id)->exists();
                     $likesCount = \App\Models\Like::where('post_id', $post->id)->count();
+                    $likeClass = $hasLiked ? 'liked' : 'not-liked';
+                    $likeText = $hasLiked ? 'Liked' : 'Like';
                 @endphp
-                <button class="like-btn btn btn-secondary" 
-                        style="padding: 8px 16px; font-size: 14px;@if($hasLiked) background-color: #dc2626; color: white;@endif" 
+                <button class="like-btn btn btn-secondary {{ $likeClass }}" 
+                        style="padding: 8px 16px; font-size: 14px;" 
                         data-post-id="{{ $post->id }}">
                     <i class="fas fa-heart"></i> 
-                    <span class="like-text">{{ $hasLiked ? 'Liked' : 'Like' }}</span>
+                    <span class="like-text">{{ $likeText }}</span>
                     <span class="like-count">{{ $likesCount }}</span>
                 </button>
             @else

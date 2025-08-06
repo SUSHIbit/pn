@@ -858,3 +858,24 @@ p {
     margin: 0;
     padding: 20px;
 }
+
+/* Like button states */
+.like-btn.liked {
+    background-color: #dc2626 !important;
+    color: white !important;
+}
+
+.like-btn.not-liked {
+    background-color: var(--stone-200);
+    color: var(--stone-700);
+}
+
+.follow-btn.following {
+    background-color: var(--stone-200);
+    color: var(--stone-700);
+}
+
+.follow-btn.not-following {
+    background-color: var(--stone-800);
+    color: white;
+}
