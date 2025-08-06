@@ -34,6 +34,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ route('posts.feed') }}" class="nav-link {{ request()->routeIs('posts.feed') ? 'active' : '' }}">
+                            <i class="fas fa-stream"></i>
+                            <span class="collapse-hide">Feed</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ route('posts.index') }}" class="nav-link {{ request()->routeIs('posts.index') ? 'active' : '' }}">
                             <i class="fas fa-newspaper"></i>
                             <span class="collapse-hide">All Posts</span>
@@ -46,9 +52,15 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('posts.liked') }}" class="nav-link {{ request()->routeIs('posts.liked') ? 'active' : '' }}">
+                            <i class="fas fa-heart"></i>
+                            <span class="collapse-hide">Liked</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('users.discover') }}" class="nav-link {{ request()->routeIs('users.discover') || request()->routeIs('users.following') || request()->routeIs('users.followers') ? 'active' : '' }}">
                             <i class="fas fa-compass"></i>
-                            <span class="collapse-hide">Explore</span>
+                            <span class="collapse-hide">Discover</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -113,5 +125,7 @@
             mainContent.classList.toggle('expanded');
         }
     </script>
+
+    @stack('scripts')
 </body>
 </html>

@@ -38,6 +38,30 @@ class Post extends Model
     }
 
     /**
+     * Get all comments for this post
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * Get all likes for this post
+     */
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    /**
+     * Get users who liked this post
+     */
+    public function likedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'likes')->withTimestamps();
+    }
+
+    /**
      * Get the image URL for this post
      */
     public function getImageUrlAttribute()
@@ -60,6 +84,30 @@ class Post extends Model
     }
 
     /**
+     * Get likes count
+     */
+    public function getLikesCountAttribute()
+    {
+        return $this->likes()->count();
+    }
+
+    /**
+     * Get comments count
+     */
+    public function getCommentsCountAttribute()
+    {
+        return $this->comments()->count();
+    }
+
+    /**
+     * Check if a user has liked this post
+     */
+    public function isLikedBy(User $user)
+    {
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
+
+    /**
      * Scope for published posts
      */
     public function scopePublished($query)
@@ -75,6 +123,14 @@ class Post extends Model
     public function scopeLatest($query)
     {
         return $query->orderBy('published_at', 'desc');
+    }
+
+    /**
+     * Scope for posts with engagement data
+     */
+    public function scopeWithEngagement($query)
+    {
+        return $query->withCount(['likes', 'comments']);
     }
 
     /**

@@ -43,12 +43,38 @@
 
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; gap: 15px;">
-            <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;" disabled>
-                <i class="fas fa-heart"></i> Like
-            </button>
-            <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;" disabled>
-                <i class="fas fa-comment"></i> Comment
-            </button>
+            @auth
+                @php
+                    // Check if user has liked this post - query directly
+                    $hasLiked = \App\Models\Like::where('user_id', auth()->id())
+                                               ->where('post_id', $post->id)
+                                               ->exists();
+                    // Get likes count - query directly
+                    $likesCount = \App\Models\Like::where('post_id', $post->id)->count();
+                @endphp
+                <button class="like-btn btn btn-secondary" 
+                        style="padding: 8px 16px; font-size: 14px;@if($hasLiked) background-color: #dc2626; color: white;@endif" 
+                        data-post-id="{{ $post->id }}">
+                    <i class="fas fa-heart"></i> 
+                    <span class="like-text">{{ $hasLiked ? 'Liked' : 'Like' }}</span>
+                    <span class="like-count">{{ $likesCount }}</span>
+                </button>
+            @else
+                @php
+                    $likesCount = \App\Models\Like::where('post_id', $post->id)->count();
+                @endphp
+                <span class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;">
+                    <i class="fas fa-heart"></i> {{ $likesCount }}
+                </span>
+            @endauth
+            
+            @php
+                $commentsCount = \App\Models\Comment::where('post_id', $post->id)->count();
+            @endphp
+            <a href="{{ route('posts.show', $post) }}" class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;">
+                <i class="fas fa-comment"></i> {{ $commentsCount }}
+            </a>
+            
             <a href="{{ route('posts.show', $post) }}" class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;">
                 Read More
             </a>
