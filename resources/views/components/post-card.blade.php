@@ -1,4 +1,3 @@
-{{-- resources/views/components/post-card.blade.php --}}
 @props(['post', 'showAuthor' => true, 'showActions' => false])
 
 <article class="post-card" style="border-bottom: 1px solid var(--stone-200); padding-bottom: 30px; margin-bottom: 30px;">
@@ -33,13 +32,26 @@
     <h3 style="margin-bottom: 15px;">
         <a href="{{ route('posts.show', $post) }}" 
            style="text-decoration: none; color: var(--stone-800);">
-            {{ $post->title }}
+            {!! $post->linked_title !!}
         </a>
     </h3>
 
     <p style="color: var(--stone-600); line-height: 1.7; margin-bottom: 15px;">
         {{ $post->excerpt }}
     </p>
+
+    {{-- Hashtags --}}
+    @if($post->hashtags && $post->hashtags->count() > 0)
+        <div style="margin-bottom: 15px;">
+            @foreach($post->hashtags as $hashtag)
+                <a href="{{ route('search.hashtag', $hashtag->name) }}" 
+                   class="post-hashtag"
+                   style="background-color: var(--stone-100); color: var(--stone-600); padding: 4px 8px; border-radius: 12px; text-decoration: none; font-size: 12px; margin-right: 6px; margin-bottom: 4px; display: inline-block; transition: all 0.2s;">
+                    #{{ $hashtag->name }}
+                </a>
+            @endforeach
+        </div>
+    @endif
 
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; gap: 15px;">
@@ -96,3 +108,12 @@
         @endif
     </div>
 </article>
+
+@push('styles')
+<style>
+.post-hashtag:hover {
+    background-color: var(--stone-200);
+    transform: translateY(-1px);
+}
+</style>
+@endpush

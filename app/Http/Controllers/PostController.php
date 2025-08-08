@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Like;
 use App\Models\Follow;
+use App\Models\Hashtag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,9 +29,12 @@ class PostController extends Controller
         return view('posts.index', compact('posts'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('posts.create');
+        // Pre-fill hashtag if coming from hashtag page
+        $hashtag = $request->get('hashtag', '');
+        
+        return view('posts.create', compact('hashtag'));
     }
 
     public function store(Request $request)
@@ -66,6 +70,9 @@ class PostController extends Controller
         }
 
         $post = Post::create($postData);
+        
+        // Extract and sync hashtags
+        $this->extractAndSyncHashtags($post);
 
         return redirect()->route('posts.show', $post)->with('success', 'Post created successfully!');
     }
@@ -76,7 +83,7 @@ class PostController extends Controller
             abort(404);
         }
 
-        $post->load(['user']);
+        $post->load(['user', 'hashtags']);
         $post->loadCount(['likes', 'comments']);
         
         $comments = $post->comments()
@@ -93,6 +100,7 @@ class PostController extends Controller
             abort(403);
         }
 
+        $post->load('hashtags');
         return view('posts.edit', compact('post'));
     }
 
@@ -136,6 +144,9 @@ class PostController extends Controller
         }
 
         $post->update($updateData);
+        
+        // Extract and sync hashtags after update
+        $this->extractAndSyncHashtags($post);
 
         return redirect()->route('posts.show', $post)->with('success', 'Post updated successfully!');
     }
@@ -150,6 +161,9 @@ class PostController extends Controller
             unlink(public_path('uploads/posts/' . $post->image));
         }
 
+        // Detach hashtags before deleting
+        $post->hashtags()->detach();
+        
         $post->delete();
 
         return redirect()->route('home')->with('success', 'Post deleted successfully!');
@@ -187,13 +201,13 @@ class PostController extends Controller
                           ->where('is_published', true)
                           ->whereNotNull('published_at')
                           ->where('published_at', '<=', now())
-                          ->with(['user'])
+                          ->with(['user', 'hashtags'])
                           ->withCount(['likes', 'comments'])
                           ->orderBy('published_at', 'desc')
                           ->paginate(10);
         } else {
             // If not following anyone, show all posts
-            $posts = Post::with(['user'])
+            $posts = Post::with(['user', 'hashtags'])
                         ->withCount(['likes', 'comments'])
                         ->where('is_published', true)
                         ->whereNotNull('published_at')
@@ -216,7 +230,7 @@ class PostController extends Controller
                            ->toArray();
 
         $posts = Post::whereIn('id', $likedPostIds)
-                    ->with(['user'])
+                    ->with(['user', 'hashtags'])
                     ->withCount(['likes', 'comments'])
                     ->where('is_published', true)
                     ->whereNotNull('published_at')
@@ -225,5 +239,53 @@ class PostController extends Controller
                     ->paginate(10);
 
         return view('posts.liked', compact('posts'));
+    }
+
+    /**
+     * Extract hashtags from post content and title, then sync with database
+     */
+    private function extractAndSyncHashtags(Post $post)
+    {
+        $text = $post->title . ' ' . $post->content;
+        $hashtags = Hashtag::extractFromText($text);
+        
+        // Sync hashtags (this will attach new ones and detach removed ones)
+        $post->hashtags()->sync(collect($hashtags)->pluck('id'));
+    }
+
+    /**
+     * Get trending posts for API/AJAX requests
+     */
+    public function trending()
+    {
+        $posts = Post::trending(7)
+                    ->with(['user', 'hashtags'])
+                    ->withCount(['likes', 'comments'])
+                    ->where('is_published', true)
+                    ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now())
+                    ->take(10)
+                    ->get();
+
+        return response()->json($posts);
+    }
+
+    /**
+     * Get posts by specific hashtag
+     */
+    public function byHashtag($hashtag)
+    {
+        $posts = Post::byHashtag($hashtag)
+                    ->with(['user', 'hashtags'])
+                    ->withCount(['likes', 'comments'])
+                    ->where('is_published', true)
+                    ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now())
+                    ->orderBy('published_at', 'desc')
+                    ->paginate(10);
+
+        $hashtagModel = Hashtag::where('name', $hashtag)->firstOrFail();
+
+        return view('posts.hashtag', compact('posts', 'hashtagModel'));
     }
 }

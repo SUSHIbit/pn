@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,6 +39,13 @@ Route::middleware('auth')->group(function () {
     
     // Home
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    
+    // Search & Explore Routes
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
+    Route::get('/search/advanced', [SearchController::class, 'advanced'])->name('search.advanced');
+    Route::get('/search/advanced/results', [SearchController::class, 'advancedSearch'])->name('search.advanced.results');
+    Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
+    Route::get('/hashtag/{hashtag}', [SearchController::class, 'hashtag'])->name('search.hashtag');
     
     // User Routes
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
